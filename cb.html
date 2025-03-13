@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coulomb Barrier Calculator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<table id="calc" border=0>
+<tr>
+<td colspan=1> Atomic no of projectile</td> 
+<td colspan=1><input type="number" id="Z1" min="1" placeholder="Enter Z1"></td>
+<td colspan=1>Mass no of projectile</td>
+<td colspan=1><input type="number" id="A1" min="1" placeholder="Enter A1"></td>
+</tr>
+<tr>
+<td colspan=1>Atomic no of target</td>
+<td colspan=1><input type="number" id="Z2" min="1" placeholder="Enter Z2"></td>
+<td colspan=1>Mass no of target</td>
+<td colspan=1><input type="number" id="A2" min="1" placeholder="Enter A2"></td>
+</tr>
+<tr>
+<td colspan=2><button id="calculate">Calculate</button></td>
+<td colspan=2><button id="clear">Clear</button></td>
+</tr>
+<tr>
+<td colspan=2><h3>Result: <span id="result"></span> MeV</h3></td>
+</tr>
+</table>
+<script>
+        $(document).ready(function(){
+            $("#calculate").click(function(){
+                var Z1 = parseFloat($("#Z1").val()) || 1;
+                var A1 = parseFloat($("#A1").val()) || 1;
+                var Z2 = parseFloat($("#Z2").val()) || 1;
+                var A2 = parseFloat($("#A2").val()) || 1;
+                
+                var r_fm = 1.1e-15*(Math.pow(A1,1/3.0) + Math.pow(A2,1/3.0));
+                var e = 1.602e-19;  // Elementary charge (C)
+                var epsilon0 = 8.854e-12;  // Permittivity of free space (F/m)
+                
+                var Ec_joules = (Z1 * Z2 * e * e) / (4 * Math.PI * epsilon0 * r_fm); // Energy in joules
+                var Ec_MeV = Ec_joules / (1.602e-13); // Convert joules to MeV
+
+                $("#result").text(Ec_MeV.toFixed(3));
+            });
+        });
+    </script>
+
+</body>
+</html>
