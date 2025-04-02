@@ -8,7 +8,6 @@ class MyMainFrame : public TGMainFrame
     TGTextButton *cal_yield_button; 
     TGTextButton *exit_button; 
     TGTextView   *text_output; 
-    TGLabel      *label;
     TGLabel      *proj_charge_state_label;
     TGLabel      *total_charge_incident_label;
     TGLabel      *total_no_of_proj_label;
@@ -146,15 +145,11 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     rxn_crxn_entry->Resize(100, 25);
     grid_frame_4->AddFrame(rxn_crxn_entry, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 0));
     
-    label = new TGLabel(grid_frame_4, "........................");
-    label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
-    grid_frame_4->AddFrame(label, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 0));
-
     cal_yield_button = new TGTextButton(grid_frame_4, "Calculate");
     cal_yield_button->Connect("Clicked()", "MyMainFrame", this, "cal_yield_button_clicked()"); // Connect to click handler
     grid_frame_4->AddFrame(cal_yield_button, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 0));
 
-    yield_label = new TGLabel(grid_frame_4, "Yield(per sec):.........................");
+    yield_label = new TGLabel(grid_frame_4, "Yield:.........................");
     grid_frame_4->AddFrame(yield_label, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 0));
     
     exit_button = new TGTextButton(grid_frame_4, "Exit");
@@ -197,7 +192,7 @@ void MyMainFrame::cal_yield_button_clicked()
 {
     
    
-    label->SetText("...........Working..........");
+    
     
     total_charge_incident_int = total_charge_incident_entry->GetNumber();
         proj_charge_state_int =     proj_charge_state_entry->GetNumber();
@@ -223,7 +218,7 @@ void MyMainFrame::cal_yield_button_clicked()
     total_no_of_target_nuclei_label->SetText("Total no of target nuclei: "+ to_TGString(total_no_of_target_nuclei_double));
               det_solid_angle_label->SetText("Detector solid angle (Sr): "+ to_TGString(det_solid_angle_double));
                         yield_label->SetText("Yield(for charge incident): "          +to_TGString(yield_double));
-    label->SetText("Calculations Complete");
+    
     return;
 }
 
