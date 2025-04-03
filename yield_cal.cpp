@@ -6,7 +6,10 @@ class MyMainFrame : public TGMainFrame
     TGGroupFrame *grid_frame_1;  
     TGGroupFrame *grid_frame_2;  
     TGGroupFrame *grid_frame_3;  
-    TGGroupFrame *grid_frame_4;  
+    TGGroupFrame *grid_frame_4;
+    TGButtonGroup *yield_cal_mode_button_group;
+    TGRadioButton *select_yield_cal_button;  
+    TGRadioButton *select_crxn_cal_button;  
     TGTextButton *cal_yield_button; 
     TGTextButton *exit_button; 
     TGTextView   *text_output; 
@@ -36,6 +39,7 @@ class MyMainFrame : public TGMainFrame
     TGNumberEntry *det_dis_entry;
     TGNumberEntry *det_eff_entry;
     TGNumberEntry *rxn_crxn_entry;
+    TGNumberEntry *yield_entry;
     
     //TGString total_no_of_proj_string;
 
@@ -51,6 +55,7 @@ class MyMainFrame : public TGMainFrame
     double det_eff_double;
     double rxn_crxn_double;
     double yield_double;
+    double yield_crxn_factor;
     int width_pixel, height_pixel;
 
     public:
@@ -152,6 +157,13 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     
     grid_frame_4 = new TGGroupFrame(global_frame, "Calculate", kVerticalFrame);
 
+    yield_cal_mode_button_group = new TGButtonGroup(grid_frame_4, "Calculator mode");
+    
+    select_yield_cal_button = new TGRadioButton(yield_cal_mode_button_group, "Yield calculator");
+    select_crxn_cal_button  = new TGRadioButton(yield_cal_mode_button_group, "Cross-section calculator");
+    grid_frame_4->AddFrame(yield_cal_mode_button_group, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
+    
+
     rxn_crxn_label = new TGLabel(grid_frame_4, "Reaction cross-section(milli barn)");
     grid_frame_4->AddFrame(rxn_crxn_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
@@ -166,10 +178,16 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     yield_label = new TGLabel(grid_frame_4, "Yield:");
     grid_frame_4->AddFrame(yield_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    yield_value_label = new TGLabel(grid_frame_4, "");
-    yield_value_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
-    grid_frame_4->AddFrame(yield_value_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
+    //yield_value_label = new TGLabel(grid_frame_4, "");
+   // yield_value_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
+   // grid_frame_4->AddFrame(yield_value_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
+
+    yield_entry = new TGNumberEntry(grid_frame_4, 100, 6, -1, TGNumberFormat::kNESReal);//default value, max digits, ID 
+    yield_entry->SetLimits(TGNumberFormat::kNELLimitMinMax, 0.0, 1e6);
+    grid_frame_4->AddFrame(yield_entry, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
+    
+
     exit_button = new TGTextButton(grid_frame_4, "Exit");
     exit_button->Connect("Clicked()", "MyMainFrame", this, "exit_button_clicked()"); // Connect to exit handler
     grid_frame_4->AddFrame(exit_button, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
@@ -210,7 +228,6 @@ TGString MyMainFrame::to_TGString(double number_double)
 
 void MyMainFrame::cal_yield_button_clicked()
 {
-    
     total_charge_incident_int = total_charge_incident_entry->GetNumber();
         proj_charge_state_int =     proj_charge_state_entry->GetNumber();
     
@@ -225,17 +242,42 @@ void MyMainFrame::cal_yield_button_clicked()
        det_dis_double =    det_dis_entry->GetNumber();
              
     det_solid_angle_double = 2.0*M_PI*(1.0 - det_dis_double/sqrt(pow(det_dis_double,2.0) + pow(det_radius_double, 2.0) ) );
-    
-    rxn_crxn_double = rxn_crxn_entry->GetNumber()*1e-27;//mb to per cm2
-    det_eff_double  = det_eff_entry->GetNumber()/100.0;
 
-    yield_double = rxn_crxn_double*total_no_of_proj_double*total_no_of_target_nuclei_double*det_solid_angle_double*det_eff_double/(4*M_PI);
+    det_eff_double  = det_eff_entry->GetNumber()/100.0;
 
              total_no_of_proj_label->SetText(to_TGString(total_no_of_proj_double));
     total_no_of_target_nuclei_label->SetText(to_TGString(total_no_of_target_nuclei_double));
               det_solid_angle_label->SetText(to_TGString(det_solid_angle_double));
-                  yield_value_label->SetText(to_TGString(yield_double));
     
+    yield_crxn_factor =   total_no_of_proj_double*
+                          total_no_of_target_nuclei_double*
+                          det_solid_angle_double*
+                          det_eff_double/(4*M_PI);
+           
+    if(select_yield_cal_button->GetState() == kButtonDown) //kButtonDown means button is pressed
+        {
+          // std::cout << "select_yield_cal_button" << std::endl;
+           rxn_crxn_double = rxn_crxn_entry->GetNumber()*1e-27;//per cm2 to mb
+    
+           yield_double = rxn_crxn_double*yield_crxn_factor;
+           
+           yield_entry->SetNumber(yield_double);
+        }
+    else if(select_crxn_cal_button->GetState() == kButtonDown)
+            {
+                //std::cout << "select_crxn_cal_button" << std::endl;
+                yield_double = yield_entry->GetNumber();
+                cout << "yield_double: " << yield_double << endl; 
+                rxn_crxn_double = yield_double/yield_crxn_factor;
+                cout << "yield_crxn_factor: " << yield_crxn_factor << endl;
+                rxn_crxn_entry->SetNumber(rxn_crxn_double*1e27);;// per cm2 to mb
+               
+            }
+    
+
+    
+    
+             
     return;
 }
 
