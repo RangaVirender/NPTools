@@ -25,6 +25,7 @@ class MyMainFrame : public TGMainFrame
     TGLabel      *det_dis_label;
     TGLabel      *det_eff_label;
     TGLabel      *det_solid_angle_label;
+    TGLabel      *solid_angle_label;
     TGLabel      *det_label;
     TGLabel      *rxn_crxn_label;
     TGLabel      *yield_label;
@@ -148,7 +149,11 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     det_eff_entry->SetLimits(TGNumberFormat::kNELLimitMinMax, 0.0, 100.0);
     grid_frame_3->AddFrame(det_eff_entry, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    det_solid_angle_label = new TGLabel(grid_frame_3, "Detector solid angle(Sr)");
+    solid_angle_label = new TGLabel(grid_frame_3, "Detector solid angle (Sr)");
+    grid_frame_3->AddFrame(solid_angle_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));    
+
+    det_solid_angle_label = new TGLabel(grid_frame_3, "");
+    det_solid_angle_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
     grid_frame_3->AddFrame(det_solid_angle_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
     det_label = new TGLabel(grid_frame_3, "");
@@ -267,9 +272,9 @@ void MyMainFrame::cal_yield_button_clicked()
             {
                 //std::cout << "select_crxn_cal_button" << std::endl;
                 yield_double = yield_entry->GetNumber();
-                cout << "yield_double: " << yield_double << endl; 
+               // cout << "yield_double: " << yield_double << endl; 
                 rxn_crxn_double = yield_double/yield_crxn_factor;
-                cout << "yield_crxn_factor: " << yield_crxn_factor << endl;
+               // cout << "yield_crxn_factor: " << yield_crxn_factor << endl;
                 rxn_crxn_entry->SetNumber(rxn_crxn_double*1e27);;// per cm2 to mb
                
             }
