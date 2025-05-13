@@ -2,7 +2,7 @@ class MyMainFrame : public TGMainFrame
 {
     private:
     
-    TGGroupFrame *global_frame;  
+    TGGroupFrame *frame_yield_cal;  
     TGGroupFrame *grid_frame_1;  
     TGGroupFrame *grid_frame_2;  
     TGGroupFrame *grid_frame_3;  
@@ -20,6 +20,7 @@ class MyMainFrame : public TGMainFrame
     TGLabel      *proj_label;
     TGLabel      *target_massNo_label;
     TGLabel      *target_density_label;
+    TGLabel      *mass_percent_label;
     TGLabel      *total_no_of_target_nuclei_label;
     TGLabel      *target_nuclei_label;
     TGLabel      *det_radius_label;
@@ -37,6 +38,7 @@ class MyMainFrame : public TGMainFrame
     TGNumberEntry *total_charge_incident_entry;
     TGNumberEntry *target_massNo_entry;
     TGNumberEntry *target_density_entry;
+    TGNumberEntry *mass_percent_entry;
     TGNumberEntry *det_radius_entry;
     TGNumberEntry *det_dis_entry;
     TGNumberEntry *det_eff_entry;
@@ -65,6 +67,7 @@ class MyMainFrame : public TGMainFrame
     int    proj_charge_state_int;
     int    target_massNo_int;
     double target_density_double;
+    double mass_percent_double;
     double total_no_of_target_nuclei_double;
     double det_radius_double;
     double det_dis_double;
@@ -100,9 +103,9 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     Pixel_t lightgray_color;
     gClient->GetColorByName("lightgray",lightgray_color);
     
-    global_frame = new TGGroupFrame(this, "-", kHorizontalFrame);
+    frame_yield_cal = new TGGroupFrame(this, "Yield calculator", kHorizontalFrame);
     
-    grid_frame_1 = new TGGroupFrame(global_frame, "Projectile parameters", kVerticalFrame);
+    grid_frame_1 = new TGGroupFrame(frame_yield_cal, "Projectile parameters", kVerticalFrame);
    
     proj_charge_state_label = new TGLabel(grid_frame_1, "Projectile charge state");
    // proj_charge_state_label->ChangeBackground(lightgray_color);
@@ -126,7 +129,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     total_no_of_proj_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
     grid_frame_1->AddFrame(total_no_of_proj_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    grid_frame_2 = new TGGroupFrame(global_frame, "Target parameters", kVerticalFrame);
+    grid_frame_2 = new TGGroupFrame(frame_yield_cal, "Target parameters", kVerticalFrame);
     
     target_massNo_label = new TGLabel(grid_frame_2, "Target Mass no");
     grid_frame_2->AddFrame(target_massNo_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
@@ -138,9 +141,16 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     target_density_label = new TGLabel(grid_frame_2, "Target density (ug/cm2)");
     grid_frame_2->AddFrame(target_density_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    target_density_entry = new TGNumberEntry(grid_frame_2, 2200, 2, -1, TGNumberFormat::kNESReal);//default value, max digits, ID 
+    target_density_entry = new TGNumberEntry(grid_frame_2, 2200, 4, -1, TGNumberFormat::kNESReal);//default value, max digits, ID 
     target_density_entry->SetLimits(TGNumberFormat::kNELLimitMinMax, 0.0, 1e7);
     grid_frame_2->AddFrame(target_density_entry, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
+  
+    mass_percent_label = new TGLabel(grid_frame_2, "Mass percent of target nuclei (%)");
+    grid_frame_2->AddFrame(mass_percent_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
+    
+    mass_percent_entry = new TGNumberEntry(grid_frame_2, 100, 4, -1, TGNumberFormat::kNESReal);//default value, max digits, ID 
+    mass_percent_entry->SetLimits(TGNumberFormat::kNELLimitMinMax, 0.0, 100.0);
+    grid_frame_2->AddFrame(mass_percent_entry, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
     target_nuclei_label = new TGLabel(grid_frame_2, "Total no of target nuclei:");
     grid_frame_2->AddFrame(target_nuclei_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
@@ -149,7 +159,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     total_no_of_target_nuclei_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
     grid_frame_2->AddFrame(total_no_of_target_nuclei_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    grid_frame_3 = new TGGroupFrame(global_frame, "Detector geometry parameters", kVerticalFrame);
+    grid_frame_3 = new TGGroupFrame(frame_yield_cal, "Detector geometry parameters", kVerticalFrame);
     
     det_radius_label = new TGLabel(grid_frame_3, "Detector Radius (cm)");
     grid_frame_3->AddFrame(det_radius_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
@@ -183,7 +193,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     det_label->SetTextColor(TColor::RGB2Pixel(255, 0, 0));
     grid_frame_3->AddFrame(det_label, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 0));
     
-    grid_frame_4 = new TGGroupFrame(global_frame, "Calculate", kVerticalFrame);
+    grid_frame_4 = new TGGroupFrame(frame_yield_cal, "Calculate", kVerticalFrame);
 
     yield_cal_mode_button_group = new TGButtonGroup(grid_frame_4, "Calculator mode");
     
@@ -265,13 +275,13 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h) : TGMainFrame(p,
     
 
     
-    global_frame->AddFrame(grid_frame_1, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
-    global_frame->AddFrame(grid_frame_2, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
-    global_frame->AddFrame(grid_frame_3, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
-    global_frame->AddFrame(grid_frame_4, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
-    global_frame->AddFrame(grid_frame_CB, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    frame_yield_cal->AddFrame(grid_frame_1, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    frame_yield_cal->AddFrame(grid_frame_2, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    frame_yield_cal->AddFrame(grid_frame_3, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    frame_yield_cal->AddFrame(grid_frame_4, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    frame_yield_cal->AddFrame(grid_frame_CB, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
     
-    AddFrame(global_frame, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
+    AddFrame(frame_yield_cal, new TGLayoutHints(kLHintsExpandX|kLHintsExpandY, 5, 5, 5, 5));
     
 
     //text_output = new TGTextView(this, 600, 300); // 200x100 pixels size
@@ -309,8 +319,10 @@ void MyMainFrame::cal_yield_button_clicked()
     
         target_massNo_int =    target_massNo_entry->GetNumber();
     target_density_double = target_density_entry->GetNumber();
+    
+    mass_percent_double = mass_percent_entry->GetNumber();
 
-    total_no_of_target_nuclei_double = 6.022e23*1e-6*target_density_double/target_massNo_int;
+    total_no_of_target_nuclei_double = 6.022e23*1e-6*target_density_double*mass_percent_double/(target_massNo_int*100.0);
 
     det_radius_double = det_radius_entry->GetNumber();
        det_dis_double =    det_dis_entry->GetNumber();
